@@ -1,0 +1,65 @@
+<!-- components/launch-detail/launch-detail.component.html
+
+<div *ngIf="loading" class="text-center my-4">
+    <p>🔄 Loading launch details…</p>
+</div>
+
+<div *ngIf="error" class="alert alert-danger">
+    {{ error }}
+    <button class="btn btn-sm btn-secondary ms-2" (click)="load()">Try again</button>
+</div>
+
+<div *ngIf="!loading && launch" class="container my-4">
+    <button class="btn btn-outline-primary mb-3" (click)="back()">← Back to Launches</button>
+
+    <h2 class="mb-1">{{ launch.name }}</h2>
+    <p class="text-muted" *ngIf="launch.date_utc">
+        {{ launch.date_utc | date:'long':'en-IN' }}
+    </p>
+
+    <p>
+        <strong>
+            {{ launch.upcoming ? '🚀 Upcoming' : (launch.success ? ' Success' : ' Failure') }}
+        </strong>
+    </p>
+
+    <p *ngIf="launch.details">{{ launch.details }}</p>
+
+    <section *ngIf="rocket" class="mt-4">
+        <h3>Rocket Info: {{ rocket.name }}</h3>
+        <p><strong>Type:</strong> {{ rocket.type }}</p>
+        <p><strong>Stages:</strong> {{ rocket.stages }}</p>
+
+        <img *ngIf="rocket.flickr_images?.length" [src]="rocket.flickr_images[0]"
+            class="img-fluid rounded shadow-sm my-2" [alt]="rocket.name" width="400" />
+
+        <p>{{ rocket.description }}</p>
+    </section>
+
+    <section *ngIf="payloads.length" class="mt-4">
+        <h3> Payloads</h3>
+        <ul class="list-group">
+            <li *ngFor="let p of payloads" class="list-group-item">
+                <p><strong>Type:</strong> {{ p.type }}</p>
+                <p><strong>Mass:</strong> {{ p.mass_kg || 'Unknown' }} kg</p>
+                <p><strong>Orbit:</strong> {{ p.orbit }}</p>
+            </li>
+        </ul>
+    </section>
+
+    <section class="mt-4">
+        <h3> External Links</h3>
+
+        <p *ngIf="launch.links?.wikipedia">
+            <a [href]="launch.links.wikipedia" target="_blank"> Wikipedia</a>
+        </p>
+
+        <p *ngIf="launch.links?.youtube_id">
+            <a [href]="'https://youtu.be/' + launch.links.youtube_id" target="_blank"> Watch on YouTube</a>
+        </p>
+
+        <p *ngIf="launch.links?.reddit?.article as article">
+            <a [href]="article" target="_blank"> Reddit Discussion</a>
+        </p>
+    </section>
+</div> -->
