@@ -1,65 +1,76 @@
-<!-- components/launch-detail/launch-detail.component.html
-
 <div *ngIf="loading" class="text-center my-4">
-    <p>🔄 Loading launch details…</p>
+    <p>Loading launch details…</p>
 </div>
 
-<div *ngIf="error" class="alert alert-danger">
+<div *ngIf="error" class="alert alert-danger text-center">
     {{ error }}
     <button class="btn btn-sm btn-secondary ms-2" (click)="load()">Try again</button>
 </div>
 
-<div *ngIf="!loading && launch" class="container my-4">
-    <button class="btn btn-outline-primary mb-3" (click)="back()">← Back to Launches</button>
+<div *ngIf="!loading && launch" class="container my-5">
+    <div class="row mb-3">
+        <div class="col">
+            <button class="btn btn-outline-primary" (click)="back()">← Back to Launches</button>
+        </div>
+    </div>
 
-    <h2 class="mb-1">{{ launch.name }}</h2>
-    <p class="text-muted" *ngIf="launch.date_utc">
-        {{ launch.date_utc | date:'long':'en-IN' }}
-    </p>
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="mb-1">{{ launch.name }}</h2>
+            <p class="text-muted" *ngIf="launch.date_utc">
+                {{ launch.date_utc | date:'long':'en-IN' }}
+            </p>
+            <p>
+                <strong>
+                    {{ launch.upcoming ? ' Upcoming' : (launch.success ? ' Success' : ' Failure') }}
+                    </strong>
+                    </p>
+            <p *ngIf="launch.details">{{ launch.details }}</p>
+        </div>
+        </div>
 
-    <p>
-        <strong>
-            {{ launch.upcoming ? '🚀 Upcoming' : (launch.success ? ' Success' : ' Failure') }}
-        </strong>
-    </p>
+    <div *ngIf="rocket" class="row mb-4">
+        <div class="col-md-6">
+            <h3>Rocket Info: {{ rocket.name }}</h3>
+            <p><strong>Type:</strong> {{ rocket.type }}</p>
+            <p><strong>Stages:</strong> {{ rocket.stages }}</p>
+            <p>{{ rocket.description }}</p>
+            </div>
+            <div class="col-md-6 text-center">
+                <img *ngIf="rocket.flickr_images?.length" [src]="rocket.flickr_images[0]"
+                class="img-fluid rounded shadow-sm my-2" [alt]="rocket.name" style="max-height: 300px;" />
+        </div>
+    </div>
 
-    <p *ngIf="launch.details">{{ launch.details }}</p>
+    <div *ngIf="payloads.length" class="row mb-4">
+        <div class="col">
+            <h3>Payloads</h3>
+            <ul class="list-group">
+                <li *ngFor="let p of payloads" class="list-group-item">
+                    <div class="row">
+                        <div class="col-md-4"><strong>Type:</strong> {{ p.type }}</div>
+                        <div class="col-md-4"><strong>Mass:</strong> {{ p.mass_kg || 'Unknown' }} kg</div>
+                        <div class="col-md-4"><strong>Orbit:</strong> {{ p.orbit }}</div>
+                    </div>
+                    </li>
+                    </ul>
+        </div>
+        </div>
 
-    <section *ngIf="rocket" class="mt-4">
-        <h3>Rocket Info: {{ rocket.name }}</h3>
-        <p><strong>Type:</strong> {{ rocket.type }}</p>
-        <p><strong>Stages:</strong> {{ rocket.stages }}</p>
-
-        <img *ngIf="rocket.flickr_images?.length" [src]="rocket.flickr_images[0]"
-            class="img-fluid rounded shadow-sm my-2" [alt]="rocket.name" width="400" />
-
-        <p>{{ rocket.description }}</p>
-    </section>
-
-    <section *ngIf="payloads.length" class="mt-4">
-        <h3> Payloads</h3>
-        <ul class="list-group">
-            <li *ngFor="let p of payloads" class="list-group-item">
-                <p><strong>Type:</strong> {{ p.type }}</p>
-                <p><strong>Mass:</strong> {{ p.mass_kg || 'Unknown' }} kg</p>
-                <p><strong>Orbit:</strong> {{ p.orbit }}</p>
-            </li>
-        </ul>
-    </section>
-
-    <section class="mt-4">
-        <h3> External Links</h3>
-
-        <p *ngIf="launch.links?.wikipedia">
-            <a [href]="launch.links.wikipedia" target="_blank"> Wikipedia</a>
-        </p>
-
-        <p *ngIf="launch.links?.youtube_id">
-            <a [href]="'https://youtu.be/' + launch.links.youtube_id" target="_blank"> Watch on YouTube</a>
-        </p>
-
-        <p *ngIf="launch.links?.reddit?.article as article">
-            <a [href]="article" target="_blank"> Reddit Discussion</a>
-        </p>
-    </section>
-</div> -->
+    <div class="row">
+        <div class="col">
+            <h3>External Links</h3>
+            <ul class="list-unstyled">
+                <li *ngIf="launch.links?.wikipedia">
+                    <a [href]="launch.links.wikipedia" target="_blank"> Wikipedia</a>
+                </li>
+                <li *ngIf="launch.links?.youtube_id">
+                    <a [href]="'https://youtu.be/' + launch.links.youtube_id" target="_blank"> Watch on YouTube</a>
+                </li>
+                <li *ngIf="launch.links?.reddit?.article as article">
+                    <a [href]="article" target="_blank"> Reddit Discussion</a>
+                </li>
+                </ul>
+                </div>
+                </div>
+                </div>

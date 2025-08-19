@@ -1,12 +1,17 @@
-<!-- <div class="container my-4">
+<div class="row">
+    <div class="col-12 text-end">
+        <button type="button" class="btn btn-secondary me-2 rounded-pill" (click)="toggleView('past')"
+            [disabled]="view === 'past'">
+            Past Launches
+        </button>
+        <button type="button" class="btn btn-success rounded-pill" (click)="toggleView('upcoming')"
+            [disabled]="view === 'upcoming'">
+            Upcoming Launches
+        </button>
+    </div>
+</div>
 
-    <nav class="btn-group mb-3">
-        <button class="btn btn-outline-primary" (click)="toggleView('past')" [disabled]="view==='past'">Past
-            Launches</button>
-        <button class="btn btn-outline-secondary" (click)="toggleView('upcoming')"
-            [disabled]="view==='upcoming'">Upcoming Launches</button>
-    </nav>
-
+<div class="container my-4">
     <form [formGroup]="filterForm" *ngIf="view==='past'" class="mb-3 row g-2 align-items-center">
         <div class="col-auto">
             <input formControlName="year" class="form-control" placeholder="Year e.g. 2020">
@@ -18,11 +23,25 @@
                 <option value="failure">Failure</option>
             </select>
         </div>
-        <div class="col-auto">
+        <!-- <div class="col-auto">
             <button type="button" class="btn btn-outline-info btn-sm" (click)="changeSort('date')">Sort by Date</button>
         </div>
         <div class="col-auto">
             <button type="button" class="btn btn-outline-info btn-sm" (click)="changeSort('name')">Sort by Name</button>
+        </div> -->
+        <div class="col-auto">
+            <button type="button" class="btn btn-outline-info btn-sm" (click)="changeSort('date')">
+                Sort by Date
+                <i *ngIf="sortKey === 'date' && sortAsc" class="bi bi-arrow-up"></i>
+                <i *ngIf="sortKey === 'date' && !sortAsc" class="bi bi-arrow-down"></i>
+            </button>
+        </div>
+        <div class="col-auto">
+            <button type="button" class="btn btn-outline-info btn-sm" (click)="changeSort('name')">
+                Sort by Name
+                <i *ngIf="sortKey === 'name' && sortAsc" class="bi bi-arrow-up"></i>
+                <i *ngIf="sortKey === 'name' && !sortAsc" class="bi bi-arrow-down"></i>
+            </button>
         </div>
     </form>
 
@@ -33,34 +52,40 @@
 
     <div *ngIf="!loading && displayed.length === 0" class="alert alert-warning">No launches found.</div>
 
-    <div class="row g-3">
+    <!-- <div class="row g-3">
         <div class="col-md-6 col-lg-4" *ngFor="let l of displayed">
-            <div class="card h-100 shadow-sm">
+            <div class="card h-100 shadow-sm border-secondary" style="border-radius: 10px;">
                 <div class="card-body" *ngIf="l">
-                    <h5 class="card-title">{{ l.name }}</h5>
-
-                    <p *ngIf="l.date_utc">
-                        <strong>Date:</strong> {{ l.date_utc | date:'long':'en-IN' }}
+                    <h5 class="card-title text-center pb-3">{{ l.name }}</h5>
+                    <p *ngIf="l.date_utc" class="d-flex justify-content-around">
+                        <strong>Date:</strong> {{ l.date_utc | date:'longDate':'en-IN' }}
                     </p>
-
-
-                    <p *ngIf="rockets.get(l.rocket)">
+                    <p *ngIf="rockets.get(l.rocket)" class="d-flex justify-content-around">
                         <strong>Rocket:</strong> {{ rockets.get(l.rocket)?.name }}
                     </p>
 
-                    <p *ngIf="l.success !== null || l.upcoming">
+                    <p *ngIf="l.success !== null || l.upcoming" class="d-flex justify-content-around">
                         <strong>Status:</strong>
                         <span *ngIf="!l.upcoming" [ngStyle]="{color: l.success ? 'green' : 'red'}">
                             {{ l.success ? 'Success' : 'Failure' }}
                         </span>
                         <span *ngIf="l.upcoming" style="color: gray">Upcoming</span>
                     </p>
-
-                    <a [routerLink]="['/launch', l.id]" class="btn btn-sm btn-primary">View Details</a>
+                    <div class="d-flex justify-content-center">
+                        <a [routerLink]="['/launch', l.id]" class="btn btn-sm text-white rounded-pill view-details-btn">
+                            View Details
+                        </a>
+                    </div>
+                    
                 </div>
-            </div>
-        </div>
-    </div>
+                </div>
+                </div>
+    </div> -->
+    
+    <ag-grid-angular style="width: 100%;" class="ag-theme-alpine" [rowData]="displayed" [columnDefs]="columnDefs"
+        [defaultColDef]="defaultColDef" [rowHeight]="35" domLayout="autoHeight" rowSelection="single">
+    </ag-grid-angular>
+
 
 
     <nav *ngIf="view==='past' && !loading" class="my-3">
@@ -68,56 +93,12 @@
             <li class="page-item" [class.disabled]="currentPage===1">
                 <button class="page-link" (click)="goPage(currentPage-1)">Previous</button>
             </li>
-            <li class="page-item active"><span class="page-link">{{currentPage}}</span></li>
+            <li class="page-item active">
+                <span class="page-link">{{currentPage}}</span>
+            </li>
             <li class="page-item" [class.disabled]="displayed.length < pageSize">
                 <button class="page-link" (click)="goPage(currentPage+1)">Next</button>
             </li>
         </ul>
     </nav>
-</div> -->
-
-<!-- <nav class="mb-3 d-flex gap-2">
-    <button class="btn btn-outline-primary" (click)="toggleView('past')" [disabled]="view === 'past'">
-        Past Launches
-    </button>
-    <button class="btn btn-outline-secondary" (click)="toggleView('upcoming')" [disabled]="view === 'upcoming'">
-        Upcoming Launches
-    </button>
-</nav> -->
-
-<div *ngIf="loading" class="alert alert-info">🔄 Loading...</div>
-<div *ngIf="error" class="alert alert-danger">{{ error }}</div>
-
-<div class="table-responsive">
-    <table class="table table-bordered table-hover" *ngIf="!loading && displayed.length > 0">
-        <thead class="table-dark">
-            <tr>
-                <th>Mission Name</th>
-                <th>Date</th>
-                <th>Rocket</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr *ngFor="let l of displayed">
-                <td>{{ l.name }}</td>
-                <td>{{ l.date_utc | date:'medium':'en-IN' }}</td>
-                <td>{{ rockets.get(l.rocket)?.name || 'Loading...' }}</td>
-                <td>
-                    <span *ngIf="!l.upcoming" [style.color]="l.success ? 'green' : 'red'">
-                        {{ l.success ? 'Success' : 'Failure' }}
-                    </span>
-                    <span *ngIf="l.upcoming" style="color: gray">Upcoming</span>
-                </td>
-                <td>
-                    <a [routerLink]="['/launch', l.id]" class="btn btn-sm btn-outline-primary">View Details</a>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-
-<div *ngIf="!loading && displayed.length === 0" class="text-muted mt-3">
-    No launches found.
 </div>

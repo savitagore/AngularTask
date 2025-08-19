@@ -32,3 +32,10 @@ export interface Payload {
   mass_kg: number;
   orbit: string;
 }
+export interface Launchpad {
+  id: string;
+  name: string;
+  locality: string;
+  region: string;
+  status: string;
+}
