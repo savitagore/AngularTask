@@ -47,13 +47,9 @@
 
     <div *ngIf="!loading && displayed.length === 0" class="alert alert-warning">No launches found.</div>
 
-<!--    
-    <ag-grid-angular style="width: 100%;" class="ag-theme-alpine" [rowData]="displayed" [columnDefs]="columnDefs"
-        [defaultColDef]="defaultColDef" [rowHeight]="35" domLayout="autoHeight" rowSelection="single">
-    </ag-grid-angular> -->
+
 
 <div class="d-flex">
-    <!-- Custom Sidebar -->
     <div class="p-2 border-end" style="min-width: 200px;">
         <h5>Columns</h5>
         <div *ngFor="let col of columnDefs">
@@ -65,15 +61,14 @@
         </div>
     </div>
 
-<!-- AG Grid -->
 <div class="flex-grow-1">
     <ag-grid-angular style="width: 100%; height: 500px;" class="ag-theme-alpine" [rowData]="displayed"
         [columnDefs]="columnDefs" [defaultColDef]="defaultColDef" [rowHeight]="35" rowSelection="single"
         (gridReady)="onGridReady($event)">
     </ag-grid-angular>
-        </div>
+</div>
     
-    </div>
+</div>
 
 
 

@@ -30,7 +30,7 @@ export class DashboardComponent {
   launches: Launch[] = [];
   rockets = new Map<string, Rocket>();
   displayed: Launch[] = [];
-  hiddenColumns: string[] = []; // Track hidden columns
+  hiddenColumns: string[] = [];
 
   view: 'past' | 'upcoming' = 'past';
   sortKey: 'date' | 'name' = 'date';
