@@ -11,7 +11,13 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { AgGridModule } from 'ag-grid-angular';
-import { ColDef } from 'ag-grid-community';
+import {
+  ColDef,
+  GridApi,
+  CellClickedEvent,
+  GridReadyEvent,
+  SideBarDef,
+} from 'ag-grid-community';
 
 @Component({
   selector: 'app-dashboard',
@@ -20,12 +26,13 @@ import { ColDef } from 'ag-grid-community';
   styleUrl: './dashboard.component.css',
 })
 export class DashboardComponent {
-  view: 'past' | 'upcoming' = 'past';
+  gridApi!: GridApi;
   launches: Launch[] = [];
   rockets = new Map<string, Rocket>();
-  loading = false;
-  error = '';
   displayed: Launch[] = [];
+  hiddenColumns: string[] = []; // Track hidden columns
+
+  view: 'past' | 'upcoming' = 'past';
   sortKey: 'date' | 'name' = 'date';
   sortAsc = true;
   pageSize = 12;
@@ -69,20 +76,16 @@ export class DashboardComponent {
       field: 'success',
       cellClass: 'text-center',
       cellRenderer: (p: any) => {
-        if (p.data.upcoming) {
-          return `<span style="color: gray">Upcoming</span>`;
-        }
-        if (p.value === true) {
+        if (p.data.upcoming) return `<span style="color: gray">Upcoming</span>`;
+        if (p.value === true)
           return `<span style="color: green">Success</span>`;
-        }
-        if (p.value === false) {
-          return `<span style="color: red">Failure</span>`;
-        }
+        if (p.value === false) return `<span style="color: red">Failure</span>`;
         return `<span style="color: orange">Unknown</span>`;
       },
     },
     {
       headerName: 'Action',
+      field: 'id',
       cellClass: 'text-center',
       cellRenderer: (p: any) =>
         `<a href="/launch/${p.data.id}" class="btn btn-sm btn-primary rounded-pill">View Details</a>`,
@@ -98,9 +101,32 @@ export class DashboardComponent {
 
   constructor(private api: SpacexApiService) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.filterForm.valueChanges.subscribe(() => this.applyFilters());
     this.loadLaunches();
+  }
+
+  onGridReady(params: GridReadyEvent) {
+    this.gridApi = params.api;
+  }
+
+  toggleColumn(field: string, event: Event) {
+    const input = event.target as HTMLInputElement; // cast target to input element
+    const show = input.checked;
+
+    this.gridApi.setColumnsVisible([field], show);
+
+    if (!show) {
+      this.hiddenColumns.push(field);
+    } else {
+      this.hiddenColumns = this.hiddenColumns.filter((f) => f !== field);
+    }
+  }
+
+  showAllColumns() {
+    const allFields = this.columnDefs.map((col) => col.field!).filter((f) => f); // get all field names
+    this.gridApi.setColumnsVisible(allFields, true); // set all columns visible
+    this.hiddenColumns = [];
   }
 
   toggleView(v: 'past' | 'upcoming') {
@@ -110,28 +136,10 @@ export class DashboardComponent {
   }
 
   loadLaunches() {
-    this.loading = true;
-    this.error = '';
-    const fetch =
-      this.view === 'past'
-        ? this.api.getPast(
-            this.pageSize,
-            (this.currentPage - 1) * this.pageSize
-          )
-        : this.api.getUpcoming();
-
-    fetch.subscribe({
-      next: (data) => {
-        this.launches = data;
-        this.totalCount = data.length;
-        this.loadRockets();
-        this.applyFilters();
-        this.loading = false;
-      },
-      error: (err) => {
-        this.error = err.message;
-        this.loading = false;
-      },
+    this.api.getPast(100, 0).subscribe((data) => {
+      this.launches = data;
+      this.displayed = data;
+      this.loadRockets();
     });
   }
 
@@ -144,11 +152,8 @@ export class DashboardComponent {
       forkJoin(ids.map((id) => this.api.getRocket(id))).subscribe({
         next: (rockets) => {
           rockets.forEach((r) => this.rockets.set(r.id, r));
-          this.applyFilters();
         },
       });
-    } else {
-      this.applyFilters();
     }
   }
 
@@ -156,14 +161,12 @@ export class DashboardComponent {
     const { year, status } = this.filterForm.value;
     let filtered = [...this.launches];
 
-    // 🔹 Year filter
     if (year) {
       filtered = filtered.filter(
         (l) => new Date(l.date_utc).getFullYear().toString() === year
       );
     }
 
-    // 🔹 Status filter
     if (status !== 'all') {
       filtered = filtered.filter((l) => {
         if (status === 'success') return l.success === true;
@@ -172,21 +175,20 @@ export class DashboardComponent {
       });
     }
 
-    // 🔹 Sorting
     filtered.sort((a, b) => {
       const key = this.sortKey === 'date' ? 'date_utc' : 'name';
       const aVal = (a[key] as string) || '';
       const bVal = (b[key] as string) || '';
-
       return this.sortAsc ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
     });
 
-    // 🔹 Pagination
     const start = (this.currentPage - 1) * this.pageSize;
     const end = start + this.pageSize;
     this.displayed = filtered.slice(start, end);
   }
 
+  loading: boolean = false;
+  error: string = '';
   changeSort(key: 'date' | 'name') {
     if (this.sortKey === key) {
       this.sortAsc = !this.sortAsc;
@@ -196,11 +198,9 @@ export class DashboardComponent {
     }
     this.applyFilters();
   }
-
   retry() {
     this.loadLaunches();
   }
-
   goPage(n: number) {
     if (n < 1) return;
     this.currentPage = n;

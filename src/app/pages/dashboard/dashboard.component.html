@@ -23,12 +23,7 @@
                 <option value="failure">Failure</option>
             </select>
         </div>
-        <!-- <div class="col-auto">
-            <button type="button" class="btn btn-outline-info btn-sm" (click)="changeSort('date')">Sort by Date</button>
-        </div>
-        <div class="col-auto">
-            <button type="button" class="btn btn-outline-info btn-sm" (click)="changeSort('name')">Sort by Name</button>
-        </div> -->
+        
         <div class="col-auto">
             <button type="button" class="btn btn-outline-info btn-sm" (click)="changeSort('date')">
                 Sort by Date
@@ -52,39 +47,34 @@
 
     <div *ngIf="!loading && displayed.length === 0" class="alert alert-warning">No launches found.</div>
 
-    <!-- <div class="row g-3">
-        <div class="col-md-6 col-lg-4" *ngFor="let l of displayed">
-            <div class="card h-100 shadow-sm border-secondary" style="border-radius: 10px;">
-                <div class="card-body" *ngIf="l">
-                    <h5 class="card-title text-center pb-3">{{ l.name }}</h5>
-                    <p *ngIf="l.date_utc" class="d-flex justify-content-around">
-                        <strong>Date:</strong> {{ l.date_utc | date:'longDate':'en-IN' }}
-                    </p>
-                    <p *ngIf="rockets.get(l.rocket)" class="d-flex justify-content-around">
-                        <strong>Rocket:</strong> {{ rockets.get(l.rocket)?.name }}
-                    </p>
-
-                    <p *ngIf="l.success !== null || l.upcoming" class="d-flex justify-content-around">
-                        <strong>Status:</strong>
-                        <span *ngIf="!l.upcoming" [ngStyle]="{color: l.success ? 'green' : 'red'}">
-                            {{ l.success ? 'Success' : 'Failure' }}
-                        </span>
-                        <span *ngIf="l.upcoming" style="color: gray">Upcoming</span>
-                    </p>
-                    <div class="d-flex justify-content-center">
-                        <a [routerLink]="['/launch', l.id]" class="btn btn-sm text-white rounded-pill view-details-btn">
-                            View Details
-                        </a>
-                    </div>
-                    
-                </div>
-                </div>
-                </div>
-    </div> -->
-    
+<!--    
     <ag-grid-angular style="width: 100%;" class="ag-theme-alpine" [rowData]="displayed" [columnDefs]="columnDefs"
         [defaultColDef]="defaultColDef" [rowHeight]="35" domLayout="autoHeight" rowSelection="single">
+    </ag-grid-angular> -->
+
+<div class="d-flex">
+    <!-- Custom Sidebar -->
+    <div class="p-2 border-end" style="min-width: 200px;">
+        <h5>Columns</h5>
+        <div *ngFor="let col of columnDefs">
+            <ng-container *ngIf="col.field">
+                <input type="checkbox" [id]="col.field" [checked]="!hiddenColumns.includes(col.field)"
+                    (change)="toggleColumn(col.field!, $event)" />
+                <label [for]="col.field">{{ col.headerName }}</label>
+            </ng-container>
+        </div>
+    </div>
+
+<!-- AG Grid -->
+<div class="flex-grow-1">
+    <ag-grid-angular style="width: 100%; height: 500px;" class="ag-theme-alpine" [rowData]="displayed"
+        [columnDefs]="columnDefs" [defaultColDef]="defaultColDef" [rowHeight]="35" rowSelection="single"
+        (gridReady)="onGridReady($event)">
     </ag-grid-angular>
+        </div>
+    
+    </div>
+
 
 
 
